@@ -3,36 +3,44 @@ name: E2E Tests - Playwright
 
 # When to trigger this workflow:
 on:
-  # Run on pushes to the 'master' branch
   push:
     branches: [master]
-  # Run on pull requests targeting the 'master' branch
   pull_request:
     branches: [master]
 
 jobs:
   e2e:
-    # Run the job on the latest Ubuntu virtual machine
+    # Use latest Ubuntu VM
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the repository code so the workflow can access it
+      # Step 1: Check out the code
       - uses: actions/checkout@v3
 
-      # Set up Node.js environment, version 18 in this case
+      # Step 2: Set up Node.js (v18)
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # Install all dependencies defined in package.json using yarn
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: yarn install
 
-      # Install the necessary Playwright browser binaries and dependencies
+      # Step 4: Install Playwright browsers and dependencies
       - name: Install Playwright Browsers
         run: yarn playwright install --with-deps
 
-      # Run Playwright tests in headless mode and report results
-      - name: Run Playwright tests (headed)
-        run: yarn playwright test --headed
+      # Step 5: Install wait-on (used to wait for the dev server)
+      - name: Install wait-on
+        run: yarn add -D wait-on
+
+      # Step 6: Start Next.js app in the background & wait for it
+      - name: Start dev server
+        run: |
+          yarn dev &                   # Start dev server in background
+          npx wait-on http://localhost:3000 # Wait until it's ready
+
+      # Step 7: Run Playwright tests (headed or headless)
+      - name: Run Playwright tests (headless)
+        run: yarn playwright test
