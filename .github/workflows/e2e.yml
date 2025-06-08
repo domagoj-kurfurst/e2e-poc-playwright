@@ -35,4 +35,4 @@ jobs:
 
       # Run Playwright tests in headless mode and report results
       - name: Run Playwright tests (headed)
-        run: xvfb-run yarn playwright test --headed
+        run: yarn playwright test --headed
