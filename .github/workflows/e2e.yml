@@ -1,0 +1,38 @@
+# Name of the GitHub Actions workflow
+name: E2E Tests - Playwright
+
+# When to trigger this workflow:
+on:
+  # Run on pushes to the 'master' branch
+  push:
+    branches: [master]
+  # Run on pull requests targeting the 'master' branch
+  pull_request:
+    branches: [master]
+
+jobs:
+  e2e:
+    # Run the job on the latest Ubuntu virtual machine
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the repository code so the workflow can access it
+      - uses: actions/checkout@v3
+
+      # Set up Node.js environment, version 18 in this case
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Install all dependencies defined in package.json using yarn
+      - name: Install dependencies
+        run: yarn install
+
+      # Install the necessary Playwright browser binaries and dependencies
+      - name: Install Playwright Browsers
+        run: yarn playwright install --with-deps
+
+      # Run Playwright tests in headless mode and report results
+      - name: Run Playwright tests (headed)
+        run: yarn playwright test --headed
